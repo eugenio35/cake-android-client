@@ -1,4 +1,4 @@
-package com.waracle.androidtest;
+package com.waracle.androidtest.util;
 
 import android.util.Log;
 
@@ -6,7 +6,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 /**
  * Created by Riad on 20/05/2015.
@@ -16,7 +15,6 @@ public class StreamUtils {
 
     // Can you see what's wrong with this???
     // - I saw 2 loops to read the same stream. We can achieve the same with ByteArrayOutputStream
-    // - We weren't using the close method
 
     public static byte[] readUnknownFully(InputStream stream) throws IOException {
 
@@ -29,5 +27,15 @@ public class StreamUtils {
         baos.flush();
 
         return baos.toByteArray();
+    }
+
+    public static void close(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage());
+            }
+        }
     }
 }

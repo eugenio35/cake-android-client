@@ -1,42 +1,105 @@
 package com.waracle.androidtest.tasks;
 
+
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.text.TextUtils;
+import android.util.Log;
+
+import com.waracle.androidtest.model.Cake;
+import com.waracle.androidtest.util.ImageCache;
+import com.waracle.androidtest.util.StreamUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by emancebo on 2/13/18.
  */
 
-public class GetCakeImage extends AsyncTask<Object, Void, Bitmap> {
+public class ImageLoader extends AsyncTask<Object, Void, Void> {
 
-    private static final String TAG = GetCakeImage.class.getSimpleName();
-    private String cakeImageUrl;
+    private static final String TAG = ImageLoader.class.getSimpleName();
+    private List<Cake> cakeList;
 
     public interface AsyncResponse {
-        void processFinish(Bitmap output);
+        void imageLoaderProcessFinish();
     }
 
-    public AsyncResponse delegate = null;
+    public ImageLoader.AsyncResponse delegate = null;
 
-    public GetCakeImage(AsyncResponse delegate) {
+    public ImageLoader(ImageLoader.AsyncResponse delegate) {
         this.delegate = delegate;
     }
 
     @Override
-    protected Bitmap doInBackground(Object... params) {
-        cakeImageUrl = String.valueOf(params[0]);
+    protected Void doInBackground(Object... params) {
+        cakeList = (ArrayList<Cake>) params[0];
+        // Can you think of a way to improve loading of bitmaps
+        // that have already been loaded previously??
 
-        try{
+        // - We're going to cache images using LruCache
 
-        }catch () {
+        ImageCache imageCache = ImageCache.getInstance();
+        try {
+            for(Cake cake : cakeList){
 
+                String url = cake.getImageUrl();
+                if (TextUtils.isEmpty(url)) {
+                    throw new InvalidParameterException("URL is empty!");
+                }
+
+                Bitmap image = convertToBitmap(loadImageData(url));
+                imageCache.addBitmapToMemoryCache(cake.getTitle(), image);
+            }
+
+
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
         }
 
         return null;
     }
 
+    private byte[] loadImageData(String url) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+
+        InputStream inputStream = null;
+        try {
+            try {
+                // Read data from workstation
+                inputStream = connection.getInputStream();
+            } catch (IOException e) {
+                // Read the error from the workstation
+                inputStream = connection.getErrorStream();
+            }
+
+            // Can you think of a way to make the entire
+            // HTTP more efficient using HTTP headers??
+
+            return StreamUtils.readUnknownFully(inputStream);
+        } finally {
+
+            // Close the input stream if it exists.
+            StreamUtils.close(inputStream);
+
+            // Disconnect the connection
+            connection.disconnect();
+        }
+    }
+
+    private Bitmap convertToBitmap(byte[] data) {
+        return BitmapFactory.decodeByteArray(data, 0, data.length);
+    }
+
     @Override
-    protected void onPostExecute(Bitmap result) {
-        delegate.processFinish(result);
+    protected void onPostExecute(Void aVoid) {
+        delegate.imageLoaderProcessFinish();
     }
 }

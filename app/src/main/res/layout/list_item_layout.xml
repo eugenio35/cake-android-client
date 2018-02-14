@@ -5,30 +5,41 @@
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/image_wrapper"
         android:orientation="vertical"
-        android:layout_width="64dp"
-        android:layout_height="64dp">
+        android:layout_width="100dp"
+        android:layout_height="100dp">
 
         <ImageView
             android:id="@+id/image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="center"
+            android:src="@mipmap/ic_launcher" />
 
     </LinearLayout>
 
     <RelativeLayout
-        android:layout_toRightOf="@+id/image"
+        android:layout_toRightOf="@+id/image_wrapper"
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/title"
+            android:text="Title"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12px" />
+            android:textSize="12pt" />
 
         <TextView
             android:id="@+id/desc"
+            android:text="my description"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/title" />
