@@ -2,6 +2,7 @@ package com.waracle.androidtest;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -34,12 +35,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+
+        StrictMode.setThreadPolicy(policy);
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
+
     }
 
     @Override
@@ -84,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            mListView = (ListView) rootView.findViewById(R.id.list);
+            mListView = (ListView) rootView.findViewById(android.R.id.list);
             return rootView;
         }
 
@@ -94,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
 
             // Create and set the list adapter.
             mAdapter = new MyAdapter();
-            mListView.setAdapter(mAdapter);
 
             // Load data from net.
             try {
@@ -103,6 +107,8 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException | JSONException e) {
                 Log.e(TAG, e.getMessage());
             }
+
+            mListView.setAdapter(mAdapter);
         }
 
 
